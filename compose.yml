@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  fastapi:
+    container_name: webapp
+    build:
+      context: ./apps/application_1
+      dockerfile: Dockerfile
+    environment:
+      # FastAPI 쪽에서 이 값을 읽어 DB 연결하도록 맞추는 게 일반적
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - dev-internal-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - dev-internal-network
+    restart: unless-stopped
+
+# Volumes
+volumes:
+  pgdata:
+
+# Networks
+networks:
+  dev-internal-network:
+    # driver:bridge

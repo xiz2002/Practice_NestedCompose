@@ -1,0 +1,137 @@
+{
+    // 컨테이너 이름
+    "name": "application_1-dev",
+    // Docker Compose 파일 경로
+    "dockerComposeFile": [
+        "../../../compose.yml",
+        "./compose.override.yml"
+    ],
+    // Attach할 서비스 명
+    "service": "fastapi",
+    // 컨테이너에서 프로젝트가 마운트 될 위치
+    "workspaceFolder": "/app",
+    //
+    "overrideCommand": true,
+    "shutdownAction": "stopCompose",
+    // 기본 사용자
+    "remoteUser": "appuser",
+    // 컨테이너에서 호스트로 노출할 포트
+    "forwardPorts": [
+        8000,
+        5678
+    ],
+    // 컨테이너의 포트 속성
+    "portsAttributes": {
+        "8000": {
+            "label": "FastAPI",
+            "onAutoForward": "openBrowser"
+        },
+        "5678": {
+            "label": "debugpy"
+        }
+    },
+    // 컨테이너 생성 후 실행 (예: 의존성 검사)
+    "postCreateCommand": "uv sync && uv pip install -U debugpy",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                // 기본터미널 설정
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash",
+                        "icon": "terminal-bash"
+                    },
+                    "zsh": {
+                        "path": "zsh"
+                    },
+                    "fish": {
+                        "path": "fish"
+                    },
+                    "tmux": {
+                        "path": "tmux",
+                        "icon": "terminal-tmux"
+                    },
+                    "pwsh": {
+                        "path": "pwsh",
+                        "icon": "terminal-powershell"
+                    }
+                },
+                // 저장 시 자동 포맷
+                "editor.formatOnSave": true,
+                // Vs code에서 사용할 인터프리터를 .venv로 고정
+                "python.defaultInterpreterPath": "/app/.venv/bin/python",
+                "python.analysis.typeCheckingMode": "basic",
+                // pylance 에서 분석 제외할 폴더 설정
+                "python.analysis.exclude": [
+                    "**/.venv/**",
+                    "**/site-packages/**",
+                    "**/__pycache__/**",
+                    "**/node_modules/**"
+                ]
+            },
+            // 자동 설치할 VS Code 확장
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    }
+}
+// No compose.override.yml
+// {
+//     // 컨테이너 이름
+//     "name": "application_1-dev",
+//     // Docker Compose 파일 경로
+//     "dockerComposeFile": [
+//         "../../compose.yml"
+//     ],
+//     // Attach할 서비스 명
+//     "service": "fastapi",
+//     // 컨테이너에서 프로젝트가 마운트 될 위치
+//     "workspaceFolder": "/app",
+//     //
+//     "overrideCommand": true,
+//     //
+//     "shutdownAction": "stopCompose",
+//     //
+//     "customizations": {
+//         // 자동 설치할 VS Code 확장
+//         "vscode": {
+//             "settings": {
+//                 // Vs code에서 사용할 인터프리터를 .venv로 고정
+//                 "python.defaultInterpreterPath": "/app/.venv/bin/python",
+//                 "python.analysis.typeCheckingMode": "basic",
+//                 "python.analysis.autoImportCompletions": true,
+//                 // pylance 에서 분석 제외할 폴더 설정
+//                 "python.analysis.exclude": [
+//                     "**/.venv/**",
+//                     "**/site-packages/**",
+//                     "**/__pycache__/**",
+//                     "**/node_modules/**"
+//                 ],
+//                 "editor.formatOnSave": true // 저장 시 자동 포맷
+//             },
+//             "extensions": [
+//                 "ms-python.python",
+//                 "ms-python.vscode-pylance",
+//                 "ms-azuretools.vscode-docker"
+//             ]
+//         }
+//     },
+//     // 컨테이너 생성 후 실행 (예: 의존성 검사)
+//     "postCreateCommand": "uv sync",
+//     // 기본 사용자
+//     "remoteUser": "appuser",
+//     // 컨테이너에서 호스트로 노출할 포트
+//     "forwardPorts": [
+//         8000
+//     ],
+//     "portsAttributes": {
+//         "8000": {
+//             "label": "FastAPI",
+//             "onAutoForward": "openBrowser"
+//         }
+//     }
+// }

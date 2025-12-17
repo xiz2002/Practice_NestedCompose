@@ -1,0 +1,18 @@
+services:
+  fastapi:
+    # 개발 시 소스코드 즉시 반영
+    volumes:
+      - ./apps/application_1/:/app:cached
+
+    # 개발용 환경변수(필요시)
+    environment:
+      # FastAPI가 읽는 변수명에 맞추세요 (예: DATABASE_URL)
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
+    # debugpy 포트 오픈
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+
+    # DevContainer가 컨테이너를 계속 유지하도록
+    command: sleep infinity

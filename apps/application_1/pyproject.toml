@@ -1,0 +1,61 @@
+[project]
+name = "fastapi-google-adk-sqlalchemy-app"
+version = "0.1.0"
+description = "FastAPI + Google ADK + SQLAlchemy project (apps as build target)"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "fastapi",
+    "sqlalchemy",
+    "google-adk",
+    "alembic>=1.17.2",
+    "uvicorn[standard]>=0.38.0",
+    "pydantic",
+    "pydantic-settings",
+    "asyncpg>=0.31.0",
+    "ruff>=0.14.9",
+    "psycopg[binary]>=3.3.2",
+    "psycopg2-binary>=2.9.11",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "apps"}
+
+[tool.setuptools.packages.find]
+where = ["apps"]
+exclude = ["migration*", "tests*"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+select = [
+    "E", # pycodestyle (에러)
+    "F", # pyflakes
+    "W", # pycodestyle (경고)
+    "I", # isort (import 정렬)
+    "UP" # pyupgrade
+]
+
+# 특정 룰 무시 설정
+ignore = [
+  "E501", # line too long (문자열, docstring에서 빈번)
+]
+
+# ruff가 검사하지 않을 디렉토리 및 파일 지정
+exclude = [".venv", "__pycache__", "migrations", "dist", "build", "docs", "tests", "exclude_bin"]
+
+# 자동수정
+fix = true
+
+# Formatting 설정
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
