@@ -1,13 +1,12 @@
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
-from sqlalchemy import pool, engine_from_config, create_engine
+from sqlalchemy import pool, engine_from_config
 
 from alembic import context
+from apps.infrastructure.database.config.postgres import build_postgres_dsn
 
 from google.adk.sessions.database_session_service import Base
-import os
-
 from google.adk.sessions.database_session_service import DynamicJSON, PreciseTimestamp, DynamicPickleType
 
 def render_item(type_, obj, autogen_context):
@@ -42,17 +41,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# 명시적으로 데이터베이스 URL 설정
-db_url = "postgresql://devuser:devpassword@postgres:5432/devdb"
-
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata=Base.metadata
-# dummy_service = DatabaseSessionService(db_url="postgresql+psycopg2://devuser:devpassword@postgres:5432/devdb")
-# target_metadata = dummy_service.Base.metadata # type: ignore
-
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -72,7 +65,9 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    # url = config.get_main_option("sqlalchemy.url")
+    url = build_postgres_dsn()
+
     context.configure(
         url=url,
         target_metadata=target_metadata,

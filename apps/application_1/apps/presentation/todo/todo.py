@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Path, HTTPException, status
-from apps.infrastructure.db.todo.model import Todo, TodoItem, TodoItems
+from apps.infrastructure.todo.model import Todo, TodoItem, TodoItems
 
 router = APIRouter()
 

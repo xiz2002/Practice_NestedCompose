@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from .routers import router as root_router
 
-app = FastAPI()
 
+app = FastAPI()
 
 @app.get("/")
 async def welcome() -> dict:

@@ -31,7 +31,7 @@
         }
     },
     // 컨테이너 생성 후 실행 (예: 의존성 검사)
-    "postCreateCommand": "uv sync && uv pip install -U debugpy",
+    "postCreateCommand": "uv sync --group dev",
     "customizations": {
         "vscode": {
             "settings": {
@@ -64,7 +64,7 @@
                 "python.analysis.typeCheckingMode": "basic",
                 // pylance 에서 분석 제외할 폴더 설정
                 "python.analysis.exclude": [
-                    "**/.venv/**",
+                    // "**/.venv/**",
                     "**/site-packages/**",
                     "**/__pycache__/**",
                     "**/node_modules/**"

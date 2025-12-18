@@ -14,7 +14,6 @@ dependencies = [
     "pydantic",
     "pydantic-settings",
     "asyncpg>=0.31.0",
-    "ruff>=0.14.9",
     "psycopg[binary]>=3.3.2",
     "psycopg2-binary>=2.9.11",
 ]
@@ -32,6 +31,16 @@ exclude = ["migration*", "tests*"]
 
 [tool.uv]
 package = false
+
+# uv add --group dev ruff pyright pytest debugpy
+# uv sync --group dev
+[dependency-groups]
+dev = [
+    "debugpy>=1.8.19",
+    "pyright>=1.1.407",
+    "pytest>=9.0.2",
+    "ruff>=0.14.9",
+]
 
 [tool.ruff]
 line-length = 120

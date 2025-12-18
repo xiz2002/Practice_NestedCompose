@@ -2,46 +2,104 @@ version: "3.8"
 
 services:
   fastapi:
-    container_name: webapp
     build:
       context: ./apps/application_1
       dockerfile: Dockerfile
+    container_name: webapp
+    restart: unless-stopped
+    networks:
+      - dev-internal-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+      - ollama-webui
+      - postgres
     environment:
       # FastAPI 쪽에서 이 값을 읽어 DB 연결하도록 맞추는 게 일반적
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-    depends_on:
-      - postgres
-    ports:
-      - "8000:8000"
-    networks:
-      - dev-internal-network
-    restart: unless-stopped
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
 
   postgres:
     image: postgres:16
     container_name: postgres
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - dev-internal-network
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 3s
       retries: 10
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
-    networks:
-      - dev-internal-network
+
+  ollama:
+    image: ollama/ollama:latest
     restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    networks:
+      - ollama-network
+    ports:
+      - "11434:11434"
+    # Uncomment the lines below to enable NVIDIA GPU support
+    # devices:
+    #   - /dev/nvidia0:/dev/nvidia0
+    #   - /dev/nvidiactl:/dev/nvidiactl
+    #   - /dev/nvidia-uvm:/dev/nvidia-uvm
+    runtime: nvidia # Use "runtime: nvidia" if you have the NVIDIA Container Toolkit installed
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      # - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=all
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+  ollama-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-webui
+    restart: unless-stopped
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - 8080:8080
+    networks:
+      - ollama-network 
+    depends_on:
+      - ollama
+    environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models
+      - OLLAMA_BASE_URLS=http://ollama:11434 #comma separated ollama hosts
+      - ENV=dev
+      - WEBUI_AUTH=False
+      - WEBUI_NAME=valiantlynx AI
+      - WEBUI_URL=http://localhost:8080
+      - WEBUI_SECRET_KEY=t0p-s3cr3t
+      - NO_PROXY=host.docker.internal
 
 # Volumes
 volumes:
   pgdata:
+  ollama:
+  open-webui:
 
 # Networks
 networks:
+  ollama-network:
   dev-internal-network:
-    # driver:bridge
