@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-
 class PostgresSettings(BaseSettings):
     """
     Docker 환경변수로부터 Postgres 접속 정보를 읽어옵니다.
@@ -43,7 +42,9 @@ class PostgresSettings(BaseSettings):
     driver: Literal["asyncpg", "psycopg"] = Field("asyncpg", alias="POSTGRES_DRIVER")
     sslmode: str | None = Field(None, alias="POSTGRES_SSLMODE")
     application_name: str | None = Field(None, alias="POSTGRES_APP_NAME")
-
+    
+    # Suppress mypy warning
+    schema: str = Field("public", alias="POSTGRES_SCHEMA") # ignore
 
 @lru_cache
 def get_postgres_settings() -> PostgresSettings:

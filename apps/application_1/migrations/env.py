@@ -1,13 +1,24 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool, engine_from_config
+from sqlalchemy import pool, MetaData, engine_from_config
 
 from alembic import context
-from apps.infrastructure.database.config.postgres import build_postgres_dsn
+from apps.infrastructure.database.config.postgres import build_postgres_dsn, get_postgres_settings
 
 from google.adk.sessions.database_session_service import Base
 from google.adk.sessions.database_session_service import DynamicJSON, PreciseTimestamp, DynamicPickleType
+
+def metadata_with_schema(base_metadata: MetaData, schema: str) -> MetaData:
+    md = MetaData(schema=schema)  # 기본 스키마 지정
+
+    for t in base_metadata.sorted_tables:
+        # SQLAlchemy 버전에 따라 메서드명이 다를 수 있음
+        if hasattr(t, "to_metadata"):
+            t.to_metadata(md)      # SA 1.4+ / 2.x
+        else:
+            t.tometadata(md)       # 구버전 호환
+
+    return md
 
 def render_item(type_, obj, autogen_context):
     """
@@ -45,14 +56,17 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata=Base.metadata
+target_metadata = metadata_with_schema(Base.metadata, get_postgres_settings().schema)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# Postgres 접속 URL 생성
+url = build_postgres_dsn(get_postgres_settings())
 
+# 마이그레이션 실행 모드에 따른 처리
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -66,14 +80,15 @@ def run_migrations_offline() -> None:
 
     """
     # url = config.get_main_option("sqlalchemy.url")
-    url = build_postgres_dsn()
-
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        include_schemas=True,
+        compare_type=True,
         dialect_opts={"paramstyle": "named"},
         render_item=render_item,
+        version_table_schema=get_postgres_settings().schema
     )
 
     with context.begin_transaction():
@@ -87,15 +102,25 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    section = config.get_section(config.config_ini_section, {})
+    section["sqlalchemy.url"] = url.replace("+asyncpg", "").replace("+psycopg", "")
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        # dict(section, **{"sqlalchemy.url": url.replace("+asyncpg", "").replace("+psycopg", "")}),
+        section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, render_item=render_item,
+            connection=connection, 
+            target_metadata=target_metadata,
+            # literal_binds=True,
+            include_schemas=True,
+            compare_type=True,
+            dialect_opts={"paramstyle": "named"},
+            render_item=render_item,
+            version_table_schema=get_postgres_settings().schema
         )
 
         with context.begin_transaction():

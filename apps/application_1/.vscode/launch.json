@@ -17,6 +17,19 @@
             ],
             "jinja": true,
             "justMyCode": true
+        },
+        {
+            "name": "Python Debugger: Alembic Debug",
+            "type": "debugpy", // python or debugpy
+            "request": "launch",
+            // "program": "${file}",
+            "module": "alembic",
+            "args": [
+                "revision",
+                "--autogenerate"
+            ],
+            "jinja": false,
+            "justMyCode": true
         }
     ]
 }
