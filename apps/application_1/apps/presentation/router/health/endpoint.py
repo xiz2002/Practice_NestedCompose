@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.applicaions.health.health_service import HealthService
+from apps.applications.health.health_service import HealthService
 from apps.domain.health.health_state import HealthStatus
 from apps.infrastructure.database.config.postgres import get_db
 from apps.infrastructure.database.health_repository import DatabaseHealthRepository
@@ -12,13 +12,13 @@ service = HealthService(DatabaseHealthRepository())
 
 
 # /api/v1/health
-@router.get("/health")
+@router.get("")
 async def liveness():
     return {"status": "ok"}
 
 
 # /api/v1/health/ready
-@router.get("/health/ready")
+@router.get("/ready")
 async def readiness(db: AsyncSession = Depends(get_db)):
     status = await service.check_db(db)
 

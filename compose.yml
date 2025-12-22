@@ -24,6 +24,7 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
+      OLLAMA_API_BASE: http://ollama:11434
 
   postgres:
     image: postgres:16
@@ -53,7 +54,7 @@ services:
     volumes:
       - ollama:/root/.ollama
     networks:
-      - ollama-network
+      - dev-internal-network
     ports:
       - "11434:11434"
     # Uncomment the lines below to enable NVIDIA GPU support
@@ -82,7 +83,7 @@ services:
     ports:
       - 8080:8080
     networks:
-      - ollama-network 
+      - dev-internal-network
     depends_on:
       - ollama
     environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models

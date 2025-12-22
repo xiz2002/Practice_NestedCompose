@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import router as root_router
+from .router.routers import router as root_router
 
 
 app = FastAPI()
@@ -11,6 +11,4 @@ async def welcome() -> dict:
     }
 
 # Todo router inclusion
-app.include_router(root_router,
-                   prefix="/api/v1",
-                   tags=["v1"])
+app.include_router(root_router, prefix="/api/v1")
