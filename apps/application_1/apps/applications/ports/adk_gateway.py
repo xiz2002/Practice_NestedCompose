@@ -13,5 +13,9 @@ class AdkGateway(ABC):
         """세션 존재 확인."""
 
     @abstractmethod
+    async def session_delete(self, app_name: str, user_id: str, session_id: str) -> bool:
+        """존재하는 세션을 삭제."""
+
+    @abstractmethod
     async def chat(self, user_id: str, session_id: str, message: str) -> str:
         """메시지를 보내고 최종 응답 텍스트 반환."""

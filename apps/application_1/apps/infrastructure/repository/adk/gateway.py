@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from google.adk.runners import Runner
 from google.genai import types
+from google.adk.runners import Runner
+from google.adk.sessions import DatabaseSessionService
 
 from apps.applications.ports.adk_gateway import AdkGateway
 
@@ -44,6 +45,21 @@ class AdkGatewayImpl(AdkGateway):
             session_id=session_id,
         )
         return s is not None
+
+    async def session_delete(self, app_name: str, user_id: str, session_id: str) -> bool:
+        s = await self._session_service.get_session(
+            app_name=app_name,
+            user_id=user_id,
+            session_id=session_id,
+        )
+        if s is not None:
+            await self._session_service.delete_session(
+                app_name=app_name, 
+                user_id=user_id, 
+                session_id=session_id
+            )
+            return True
+        return False
 
     async def chat(self, user_id: str, session_id: str, message: str) -> str:
         # 세션 없으면 Application이 아니라 여기서도 막아도 되지만,

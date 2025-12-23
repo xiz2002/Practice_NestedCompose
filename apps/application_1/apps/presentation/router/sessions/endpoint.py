@@ -4,6 +4,10 @@ from apps.applications.usecases.create_session import (
     CreateSessionUseCase,
     CreateSessionCommand,
 )
+from apps.applications.usecases.delete_session import (
+    DeleteSessionUseCase,
+    DeleteSessionCommand
+)
 from apps.applications.usecases.reconnect_session import (
     ReconnectSessionUseCase,
     ReconnectSessionQuery,
@@ -12,11 +16,14 @@ from apps.presentation.dependency import (
     get_app_name,
     get_create_session_uc,
     get_reconnect_session_uc,
+    get_delete_session_uc,
 )
 from apps.presentation.schemas.sessions import (
     CreateSessionRequest,
     CreateSessionResponse,
     SessionInfoResponse,
+    DeleteSessionRequest,
+    DeleteSessionResponse,
 )
 
 router = APIRouter()
@@ -53,4 +60,22 @@ async def reconnect_session(
         app_name=app_name,
         user_id=result.user_id,
         session_id=result.session_id,
+    )
+
+@router.delete("", response_model=DeleteSessionResponse)
+async def delete_session(
+    req: DeleteSessionRequest,
+    uc: DeleteSessionUseCase = Depends(get_delete_session_uc),
+):
+    result = await uc.execute(
+        DeleteSessionCommand(
+            app_name=req.app_name, 
+            user_id=req.user_id, 
+            session_id=req.session_id
+        )
+    )
+    return DeleteSessionResponse(
+        app_name=result.app_name, 
+        user_id=result.user_id, 
+        session_id=result.session_id
     )

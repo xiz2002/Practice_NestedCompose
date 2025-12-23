@@ -18,3 +18,15 @@ class SessionInfoResponse(BaseModel):
     app_name: str
     user_id: str
     session_id: str
+
+
+class DeleteSessionRequest(BaseModel):
+    app_name: str = Field(..., examples=["application_name"])
+    user_id: str = Field(..., examples=["user123"])
+    session_id: Optional[str] = Field(None, examples=["sess_abc123"])
+
+
+class DeleteSessionResponse(BaseModel):
+    app_name: str
+    user_id: str
+    session_id: str

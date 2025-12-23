@@ -89,11 +89,11 @@ def build_postgres_dsn(settings: PostgresSettings | None = None) -> str:
     return dsn
 
 
-def build_postgres_dsn_sync() -> str:
+def build_postgres_dsn_sync(settings: PostgresSettings | None = None) -> str:
     """
     동기용 Postgres DSN(SQLAlchemy URL)을 생성합니다.
     """
-    return build_postgres_dsn().replace("+asyncpg", "")
+    return build_postgres_dsn(settings).replace("+asyncpg", "")
 
 
 @lru_cache
