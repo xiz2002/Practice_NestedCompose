@@ -1,9 +1,7 @@
-version: "3.8"
-
 services:
   fastapi:
     build:
-      context: ./apps/application_1
+      context: ./apps/adk
       dockerfile: Dockerfile
     container_name: webapp
     restart: unless-stopped
@@ -17,14 +15,15 @@ services:
       - postgres
     environment:
       # FastAPI 쪽에서 이 값을 읽어 DB 연결하도록 맞추는 게 일반적
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
-      OLLAMA_API_BASE: http://ollama:11434
+      #- DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE}
+      - LITE_LLM_API_BASE=${LITE_LLM_API_BASE}
 
   postgres:
     image: postgres:16
@@ -37,11 +36,11 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -49,17 +48,22 @@ services:
       retries: 10
 
   ollama:
-    image: ollama/ollama:latest
+    # image: ollama/ollama:latest
+    build:
+      context: ./apps/ollama
+      dockerfile: Dockerfile
+    container_name: ollama
     restart: unless-stopped
-    volumes:
-      - ollama:/root/.ollama
+    # volumes:
+    #   - ollama:/root/.ollama
     networks:
       - dev-internal-network
     ports:
       - "11434:11434"
     runtime: nvidia # Use "runtime: nvidia" if you have the NVIDIA Container Toolkit installed
     environment:
-      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_KEEP_ALIVE=15m
+
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: ollama-webui
@@ -73,13 +77,46 @@ services:
     depends_on:
       - ollama
     environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models
-      - OLLAMA_BASE_URLS=http://ollama:11434 #comma separated ollama hosts
+      - OLLAMA_BASE_URLS=${OLLAMA_API_BASE} #comma separated ollama hosts
       - ENV=dev
       - WEBUI_AUTH=False
       - WEBUI_NAME=valiantlynx AI
-      - WEBUI_URL=http://localhost:8080
-      - WEBUI_SECRET_KEY=t0p-s3cr3t
-      - NO_PROXY=host.docker.internal
+      - WEBUI_URL=${OLLAMA_WEB_BASE}
+      - WEBUI_SECRET_KEY=${OLLAMA_WEB_SECRET_KEY}
+      - NO_PROXY=host.docker.internal,localhost,127.0.0.1
+
+  litellm:
+    # build:
+    #   context: ./apps/litellm
+    #   dockerfile: Dockerfile
+    image: docker.litellm.ai/berriai/litellm:main-latest
+    container_name: litellm
+    restart: unless-stopped
+    volumes:
+      - ./apps/litellm/config.yaml:/app/config.yaml
+    ports:
+      - 4000:4000
+    networks:
+      - dev-internal-network
+    depends_on:
+      - ollama
+    environment:
+      - LITELLM_LOG=DEBUG
+      - LITELLM_MASTER_KEY=${LITE_LLM_MASTER_KEY}
+      # - SERVER_ROOT_PATH=${LITE_LLM_API_PREFIX}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - AZURE_API_BASE=${LITE_LLM_AZURE_API_BASE}
+      - AZURE_API_KEY=${LITE_LLM_AZURE_API_KEY}
+      # - OPENAI_API_KEY=${LITE_LLM_OPENAI_API_KEY}
+      # - NO_PROXY=host.docker.internal
+    healthcheck:  # Defines the health check configuration for the container
+      test:
+        - CMD-SHELL
+        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"  # Command to execute for health check
+      interval: 30s  # Perform health check every 30 seconds
+      timeout: 10s   # Health check command times out after 10 seconds
+      retries: 3     # Retry up to 3 times if health check fails
+      start_period: 40s  # Wait 40 seconds after container start before beginning health checks
 
 # Volumes
 volumes:
@@ -89,5 +126,4 @@ volumes:
 
 # Networks
 networks:
-  ollama-network:
   dev-internal-network:

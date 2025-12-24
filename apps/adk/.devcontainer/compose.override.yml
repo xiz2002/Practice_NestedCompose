@@ -2,7 +2,7 @@ services:
   fastapi:
     # 개발 시 소스코드 즉시 반영
     volumes:
-      - ./apps/application_1/:/app:cached
+      - ./apps/adk/:/app:cached
     # 개발용 환경변수(필요시)
     # environment:
     # debugpy 포트 오픈
