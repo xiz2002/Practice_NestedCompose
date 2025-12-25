@@ -34,6 +34,14 @@
     "postCreateCommand": "uv sync --group dev",
     "customizations": {
         "vscode": {
+            // 자동 설치할 VS Code 확장
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker",
+                "charliermarsh.ruff",
+                "Continue.continue"
+            ],
             "settings": {
                 // 기본터미널 설정
                 "terminal.integrated.defaultProfile.linux": "bash",
@@ -58,24 +66,25 @@
                     }
                 },
                 // 저장 시 자동 포맷
-                "editor.formatOnSave": true,
-                // Vs code에서 사용할 인터프리터를 .venv로 고정
-                "python.defaultInterpreterPath": "/app/.venv/bin/python",
-                "python.analysis.typeCheckingMode": "basic",
-                // pylance 에서 분석 제외할 폴더 설정
-                "python.analysis.exclude": [
-                    // "**/.venv/**",
-                    "**/site-packages/**",
-                    "**/__pycache__/**",
-                    "**/node_modules/**"
-                ]
-            },
-            // 자동 설치할 VS Code 확장
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-azuretools.vscode-docker"
-            ]
+                "editor.formatOnSave": false,
+                "[python]": {
+                    "editor.defaultFormatter": null,
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll.ruff": true,
+                        "source.organizeImports.ruff": true
+                    },
+                    // Vs code에서 사용할 인터프리터를 .venv로 고정
+                    "defaultInterpreterPath": "/app/.venv/bin/python",
+                    "analysis.typeCheckingMode": "basic",
+                    // pylance 에서 분석 제외할 폴더 설정
+                    "analysis.exclude": [
+                        // "**/.venv/**",
+                        "**/site-packages/**",
+                        "**/__pycache__/**",
+                        "**/node_modules/**"
+                    ]
+                }
+            }
         }
     }
 }

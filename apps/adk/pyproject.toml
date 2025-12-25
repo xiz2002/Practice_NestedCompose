@@ -46,7 +46,7 @@ dev = [
 
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py314"
 select = [
     "E", # pycodestyle (에러)
     "F", # pyflakes
@@ -64,9 +64,9 @@ ignore = [
 exclude = [".venv", "__pycache__", "migrations", "dist", "build", "docs", "tests", "exclude_bin"]
 
 # 자동수정
-fix = true
+fix = false
 
 # Formatting 설정
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
+#[tool.ruff.format]
+#quote-style = "double"
+#indent-style = "space"

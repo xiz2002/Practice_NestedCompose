@@ -10,10 +10,13 @@ router = APIRouter()
 async def agent_info(app_name: str = Depends(get_app_name)):
     """
     Agent 조회
+    # TODO: ResponseBody 생성
     """
     return {
         "app_name": app_name,
     }
+
+
 # @router.post("", response_class=)
 # async def set_agent(req: [ req.body()]):
 #     """
@@ -25,4 +28,3 @@ async def agent_info(app_name: str = Depends(get_app_name)):
 #         "model": MODEL_ID,
 #         "session_db_url": DB_URL,
 #     }
-
