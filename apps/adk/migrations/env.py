@@ -1,9 +1,11 @@
+import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool, MetaData, engine_from_config
+from sqlalchemy import Connection, pool, MetaData, engine_from_config
 
 from alembic import context
-from apps.infrastructure.database.config.postgres import build_postgres_dsn, get_postgres_settings
+from apps.infrastructure._database.config.postgres import build_postgres_dsn, get_postgres_settings,get_async_engine
+from apps.infrastructure.agent.orm.agents import AgentEntity
 
 from google.adk.sessions.database_session_service import Base
 from google.adk.sessions.database_session_service import DynamicJSON, PreciseTimestamp, DynamicPickleType
@@ -43,6 +45,12 @@ def render_item(type_, obj, autogen_context):
 
     return False
 
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table":
+        # adk 스키마만 허용
+        return object.schema == get_postgres_settings().db_schema
+    return True
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -56,7 +64,10 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = metadata_with_schema(Base.metadata, get_postgres_settings().schema)
+target_metadata = [
+    metadata_with_schema(Base.metadata, get_postgres_settings().db_schema),
+    metadata_with_schema(AgentEntity.metadata, get_postgres_settings().db_schema)
+]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -64,21 +75,21 @@ target_metadata = metadata_with_schema(Base.metadata, get_postgres_settings().sc
 # ... etc.
 
 # Postgres 접속 URL 생성
-url = build_postgres_dsn(get_postgres_settings())
+url = build_postgres_dsn()
 
-# 마이그레이션 실행 모드에 따른 처리
+# # 마이그레이션 실행 모드에 따른 처리
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
+    # """Run migrations in 'offline' mode.
 
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
+    # This configures the context with just a URL
+    # and not an Engine, though an Engine is acceptable
+    # here as well.  By skipping the Engine creation
+    # we don't even need a DBAPI to be available.
 
-    Calls to context.execute() here emit the given string to the
-    script output.
+    # Calls to context.execute() here emit the given string to the
+    # script output.
 
-    """
+    # """"
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -93,40 +104,61 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
-
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    # """Run migrations in 'online' mode.
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    # In this scenario we need to create an Engine
+    # and associate a connection with the context.
 
-    """
+    # """
     section = config.get_section(config.config_ini_section, {})
     section["sqlalchemy.url"] = url.replace("+asyncpg", "").replace("+psycopg", "")
     connectable = engine_from_config(
         # dict(section, **{"sqlalchemy.url": url.replace("+asyncpg", "").replace("+psycopg", "")}),
         section,
         prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        poolclass=pool.NullPool
     )
 
     with connectable.connect() as connection:
         context.configure(
             connection=connection, 
             target_metadata=target_metadata,
-            # literal_binds=True,
             include_schemas=True,
             compare_type=True,
             dialect_opts={"paramstyle": "named"},
             render_item=render_item,
-            version_table_schema=get_postgres_settings().schema
+            version_table_schema=get_postgres_settings().schema,
+            include_object=include_object
         )
 
         with context.begin_transaction():
             context.run_migrations()
-
-
+"""
 if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+"""
+
+def do_run_migration(conn: Connection):
+    context.configure(
+        connection=conn, 
+        target_metadata=target_metadata,
+        include_schemas=True,
+        compare_type=True,
+        dialect_opts={"paramstyle": "named"},
+        render_item=render_item,
+        version_table_schema=get_postgres_settings().db_schema,
+        include_object=include_object
+    )
+    with context.begin_transaction():
+        context.run_migrations()
+
+async def run_migration_async():
+    async_engine = get_async_engine()
+
+    async with async_engine.connect() as conn:
+        await conn.run_sync(do_run_migration)
+
+asyncio.run(run_migration_async())

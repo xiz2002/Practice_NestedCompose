@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{ "name": "/", "path": "." },
+		{ "name": "/apps/adk", "path": "apps/adk" },
+		{ "name": "/apps/litellm", "path": "apps/litellm" },
+		{ "name": "/apps/ollama", "path": "apps/ollama" }
+	],
+	"settings": {
+		"python.terminal.activateEnvironment": true,
+  		// "python.venvPath": "${workspaceFolder}/apps",
+  		"python.analysis.extraPaths": []
+	}
+}

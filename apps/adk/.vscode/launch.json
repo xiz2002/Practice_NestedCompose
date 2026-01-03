@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Fast API Container Debug",
+            "name": "(In Dev Container) Python Debugger: Fast API Container Debug",
             "type": "debugpy", // python or debugpy
             "request": "launch",
             // "program": "${file}",
@@ -19,12 +19,14 @@
             "justMyCode": true
         },
         {
-            "name": "Python Debugger: Alembic Debug",
+            "name": "(In Dev Container) Python Debugger: Alembic Debug",
             "type": "debugpy", // python or debugpy
             "request": "launch",
             // "program": "${file}",
             "module": "alembic",
             "args": [
+                // "upgrade",
+                // "head"
                 "revision",
                 "--autogenerate"
             ],

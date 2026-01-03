@@ -7,9 +7,16 @@ model_list:
     litellm_params:
       model: ollama_chat/qwen3-coder:30b
       api_base: os.environ/OLLAMA_API_BASE
-# - model_name: ollama-qwen3-4b
+  - model_name: ollama-qwen3-4b
+    litellm_params:
+      model: ollama_chat/qwen3:4b
+      api_base: os.environ/OLLAMA_API_BASE
 #   litellm_params:
 #     model: ollama/qwen3-Q4_K_M:4b
     # api_base: os.environ/OLLAMA_API_BASE # runs os.getenv("OLLAMA_API_BASE")
     # api_key: os.environ/OLLAMA_API_KEY # runs os.getenv("OLLAMA_API_KEY")
     # api_version: "2025-12-24"
+
+# general_settings:
+#   master_key: "Ssk-1234"
+#   database_url: "postgresql://username:password@localhost:5432/mydb?schema=myschema"

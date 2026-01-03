@@ -1,0 +1,22 @@
+// {
+//     "version": "0.2.0",
+//     "configurations": [
+//         {
+//             "name": "Attach apps/Adk",
+//             "type": "debugpy",
+//             "request": "attach",
+//             "preLaunchTask": "compose: up (fastapi)",
+//             "connect": {
+//                 "host": "localhost",
+//                 "port": 5678
+//             },
+//             "pathMappings": [
+//                 {
+//                     "localRoot": "${workspaceFolder}/apps/adk",
+//                     "remoteRoot": "/app"
+//                 }
+//             ],
+//             "justMyCode": true
+//         }
+//     ]
+// }

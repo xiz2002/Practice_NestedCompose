@@ -3,8 +3,8 @@
     "name": "application_1-dev",
     // Docker Compose 파일 경로
     "dockerComposeFile": [
-        "../../../compose.yml",
-        "./compose.override.yml"
+        "../../../compose.yaml",
+        "./compose.override.yaml"
     ],
     // Attach할 서비스 명
     "service": "fastapi",
