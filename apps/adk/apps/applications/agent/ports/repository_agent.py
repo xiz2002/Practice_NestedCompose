@@ -1,11 +1,12 @@
-# application/ports/agent_repository.py
+from __future__ import annotations
+
 from typing import Protocol
 
-from apps.domain.agent.agent import Agent
+from apps.domain.agent import Agent
 
 
 class AgentRepository(Protocol):
-    async def list(self) -> list[Agent]: ...
+    async def all(self) -> list[Agent]: ...
     """Agent 리스트 취득"""
 
     async def get(self, id: str) -> Agent: ...

@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from apps.applications.agent.dto.agent_dto import AgentDTO
-from apps.applications.agent.mapper.mapper import make_dto_from_entity
-from apps.applications.agent.ports.agent_repository import AgentRepository
+from apps.applications.agent.dto.dto_agent import AgentDTO
+from apps.applications.agent.mapper import make_dto_from_entity
+from apps.applications.agent.services import AgentService
 
 
 class AgentDeleteUseCase:
-    def __init__(self, id: str, repo: AgentRepository):
+    def __init__(self, id: str, service: AgentService):
         self._id = id
-        self._repo = repo
+        self._service = service
 
     async def execute(self) -> AgentDTO:
-        result = await self._repo.delete(self._id)
+        result = await self._service.delete(self._id)
 
         return make_dto_from_entity(result)

@@ -4,7 +4,7 @@
 # ※(Domain -> Presentaion은 금지.)
 from pydantic import BaseModel, Field
 
-from apps.domain.agent.agent import AgentType
+from apps.domain.agent import AgentType
 
 
 class AgentCreateRequest(BaseModel):

@@ -5,11 +5,10 @@ from apps.applications.agent.mapper import make_dto_from_entity
 from apps.applications.agent.services import AgentService
 
 
-class AgentSearchUseCase:
-    def __init__(self, id: str, service: AgentService):
-        self._id = id
+class AgentSearchListUseCase:
+    def __init__(self, service: AgentService):
         self._service = service
 
-    async def execute(self) -> AgentDTO:
-        agent = await self._service.get(self._id)
-        return make_dto_from_entity(agent)
+    async def execute(self) -> list[AgentDTO]:
+        agents = await self._service.all()
+        return [make_dto_from_entity(e) for e in agents]

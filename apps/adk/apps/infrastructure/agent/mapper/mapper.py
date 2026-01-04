@@ -1,6 +1,5 @@
 
-from apps.domain.agent.agent import Agent
-from apps.domain.agent.types import AgentType
+from apps.domain.agent import Agent, AgentType
 from apps.infrastructure.agent.orm.agents import AgentEntity
 
 

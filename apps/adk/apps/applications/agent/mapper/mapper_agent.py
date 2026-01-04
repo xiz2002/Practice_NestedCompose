@@ -1,5 +1,5 @@
-from apps.applications.agent.dto.agent_dto import AgentCreateCommand, AgentDTO
-from apps.domain.agent.agent import Agent
+from apps.applications.agent.dto import AgentCreateCommand, AgentDTO
+from apps.domain.agent import Agent
 
 """
 ② Application → Domain (Command → Entity)

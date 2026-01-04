@@ -1,4 +1,4 @@
-from .agent_dto import AgentCreateCommand, AgentDTO, AgentUpdateCommand
+from .dto_agent import AgentCreateCommand, AgentDTO, AgentUpdateCommand
 
 __all__ = [
     "AgentCreateCommand",

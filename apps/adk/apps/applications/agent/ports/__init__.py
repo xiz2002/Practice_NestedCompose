@@ -1,4 +1,4 @@
-from .agent_repository import AgentRepository
+from .repository_agent import AgentRepository
 
 __all__ = [
     "AgentRepository"

@@ -11,7 +11,7 @@ AgentUpdateRequest + id → UpdateAgentCommand
 
 
 # from applications.agent.dto.agent_dto import AgentDTO
-from apps.applications.agent.dto.agent_dto import AgentCreateCommand, AgentDTO, AgentUpdateCommand
+from apps.applications.agent.dto import AgentCreateCommand, AgentDTO, AgentUpdateCommand
 from apps.presentation.agent.schemas.agent import AgentCreateRequest, AgentResponse, AgentUpdateRequest
 
 
@@ -36,7 +36,6 @@ def make_update_to_command(id: str, req: AgentUpdateRequest) -> AgentUpdateComma
         type=req.type if req.type is not None else None,
         tools=req.tools if req.tools is not None else None
     )
-
 
 # ------------------------------------------
 # Application -> Presentation

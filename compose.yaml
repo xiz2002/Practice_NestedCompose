@@ -43,6 +43,7 @@ services:
       # - DATABASE_SCHEMA=${LITE_LLM_SCHEMA}
       # - SERVER_ROOT_PATH=${LITE_LLM_API_PREFIX}
       - OLLAMA_API_BASE=${OLLAMA_API_BASE}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY}
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     # Windows Host에 접근을 하기 위한 설정.
     extra_hosts:

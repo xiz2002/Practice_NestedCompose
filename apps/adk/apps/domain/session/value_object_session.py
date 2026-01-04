@@ -1,5 +1,13 @@
+
 from dataclasses import dataclass
 
+# @dataclass
+# class Session:
+#     app_name: str
+#     user_id: str
+#     id: str
+#     state: dict
+#     exists: bool
 
 @dataclass(frozen=True)
 class AppName:

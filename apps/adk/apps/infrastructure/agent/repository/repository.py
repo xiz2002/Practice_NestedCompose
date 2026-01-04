@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.applications.agent.ports import AgentRepository
-from apps.domain.agent.agent import Agent
+from apps.domain.agent import Agent
 from apps.infrastructure.agent.mapper import _to_domain
 from apps.infrastructure.agent.orm import AgentEntity
 
@@ -24,7 +24,7 @@ class AgentRepositoryImpl(AgentRepository):
         """
         self._session = session
 
-    async def list(self) -> list[Agent]:
+    async def all(self) -> list[Agent]:
         """
         Agent 정보 리스트 취득
 

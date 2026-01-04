@@ -46,7 +46,7 @@ class DatabaseSessionServiceEx(DatabaseSessionService):
         self.database_session_factory = maker
 
         # Flag to indicate if tables are created
-        self._tables_created = False
+        self._tables_created = True
 
         # Lock to ensure thread-safe table creation
         self._table_creation_lock = asyncio.Lock()
@@ -54,11 +54,12 @@ class DatabaseSessionServiceEx(DatabaseSessionService):
 
 class SessionProvider:
     """ """
-    def __init__(self, engine: AsyncEngine, maker: async_sessionmaker) -> None:
+    def __init__(self, engine: AsyncEngine, maker: async_sessionmaker):
         self._engine = engine
         self._maker = maker
 
     def __call__(self) -> DatabaseSessionServiceEx:
+        print("SessionProvicer.__call__")
         return DatabaseSessionServiceEx(engine=self._engine, maker=self._maker)
 
     # def build_session_service() -> DatabaseSessionService:
