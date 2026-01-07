@@ -46,8 +46,8 @@ services:
       - OLLAMA_API_KEY=${OLLAMA_API_KEY}
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     # Windows Host에 접근을 하기 위한 설정.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
     # Defines the health check configuration for the container
     healthcheck:
       test:

@@ -1,26 +1,39 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from google.adk.agents import BaseAgent as ADK_BaseAgent
 from google.adk.agents import LlmAgent as ADK_LlmAgent
 from google.adk.models import LiteLlm
 from google.adk.runners import Runner
+from google.adk.tools.base_tool import BaseTool
+from google.adk.tools.base_toolset import BaseToolset
 
 from apps.domain.agent import Agent as App_Agent
 from apps.infrastructure.session.services.provider import DatabaseSessionServiceEx
+from apps.tools import get_weather
 
+type ToolUnion = Callable | BaseTool | BaseToolset
+ToolFactory = Callable[[], ToolUnion]
+TOOL_REGISTRY: dict[str, ToolFactory] = {
+    "get_weather": lambda: get_weather,
+    # 필요 시 MCP/OpenAPI toolset도 여기에 팩토리로 등록
+}
 
 class AdkFactory:
     def __init__(self, model: LiteLlm):
         self._model = model
 
-    def _build_tool(
-        self,
-        tools: list[str]
-    ):
+    def _build_tool(self,tools: list[str]) -> list[ToolUnion]:
         """ Convert Str -> Callable """
-        # ToolUnion: TypeAlias = Union[Callable, BaseTool, BaseToolset]
-        # TODO:
-        return []
+        _tools: list[ToolUnion] = []
+        for name in tools:
+            factory = TOOL_REGISTRY.get(name)
+            if not factory:
+                # 정책 선택: (1) 무시 (2) 예외 (3) 로깅 후 무시
+                raise ValueError(f"Unknown tool name in DB: {name}")
+            _tools.append(factory())
+        return _tools
 
     def _build_agent(
         self,

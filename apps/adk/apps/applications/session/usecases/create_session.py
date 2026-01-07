@@ -4,7 +4,7 @@ import uuid
 
 from apps.applications.session.dto import CreateSessionCommand, SessionInfoResult
 from apps.applications.session.ports.adk_gateway import AdkGateway
-from apps.domain.session import SessionId, UserId
+from apps.domain.session import SessionId, State, UserId
 
 
 class CreateSessionUseCase:
@@ -15,9 +15,11 @@ class CreateSessionUseCase:
         # 1. Domain 설정
         user_id = UserId(cmd.user_id)
         session_id = SessionId(str(uuid.uuid4()))
+        state = State(cmd.state)
 
         # 2. 세션 등록
         return await self._gateway.ensure_session(
             user_id=user_id.value,
-            session_id=session_id.value
+            session_id=session_id.value,
+            state=state.value
         )

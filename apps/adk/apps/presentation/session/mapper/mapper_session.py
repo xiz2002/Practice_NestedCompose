@@ -21,6 +21,7 @@ from apps.presentation.session.schemas import CreateSessionRequest, DeleteSessio
 def make_create_session_to_command(req: CreateSessionRequest) -> CreateSessionCommand:
     return CreateSessionCommand(
         user_id=req.user_id,
+        state=req.state,
     )
 
 def make_delete_session_to_command(req: DeleteSessionRequest) -> DeleteSessionCommand:

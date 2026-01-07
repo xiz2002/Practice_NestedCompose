@@ -40,12 +40,13 @@ class AdkGatewayImpl(AdkGateway):
     def _session_service(self):
         return self._service
 
-    async def ensure_session(self, user_id: str, session_id: str) -> SessionInfoResult:
+    async def ensure_session(self, user_id: str, session_id: str, state: dict[str, Any] | None = None) -> SessionInfoResult:
         return _to_dto(
             await self._session_service.create_session(
                 app_name=self._app_name,
                 user_id=user_id,
                 session_id=session_id,
+                state=state,
             )
         )
 

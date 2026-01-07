@@ -1,7 +1,8 @@
-from .value_object_session import AppName, SessionId, UserId
+from .value_object_session import AppName, SessionId, State, UserId
 
 __all__ = [
     "AppName",
     "SessionId",
-    "UserId"
+    "UserId",
+    "State"
 ]

@@ -9,7 +9,7 @@ from apps.applications.session.dto import SessionInfoResult
 
 class AdkGateway(ABC):
     @abstractmethod
-    async def ensure_session(self, user_id: str, session_id: str) -> SessionInfoResult:
+    async def ensure_session(self, user_id: str, session_id: str, state: dict[str, Any] | None) -> SessionInfoResult:
         """세션이 없으면 생성(있으면 그대로)."""
 
     @abstractmethod
